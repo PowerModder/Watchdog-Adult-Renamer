@@ -13,7 +13,7 @@ This application was made to be runned while you download files. However, you ca
 
 ### Changelog
 
-[x] Initial support of some Adult sites (list of sites supported:sitelist.md)
+[x]Initial support of some Adult sites (list of sites supported:sitelist.md)
 
 
 ### Usage and directions
