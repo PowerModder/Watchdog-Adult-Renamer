@@ -12,8 +12,7 @@ This application was made to be runned while you download files. However, you ca
   - Script to create an exact clone of another directory.
 
 ### Changelog
-
-[x]Initial support of some Adult sites (list of sites supported:sitelist.md)
+  - Initial support of some Adult sites
 
 
 ### Usage and directions
