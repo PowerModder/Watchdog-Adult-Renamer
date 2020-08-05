@@ -18,7 +18,7 @@ This application was made to be runned while you download files. However, you ca
 ### Usage and directions
 
 1. Download the files as a zip and extract them to your desired location.
-2. Open a terminal and run the command `pip install -r requirements.txt` or open the requirements.txt to see if you already satisfied the requirements.
+2. Open a terminal to the location you extract the Watchdog and run the command `pip install -r requirements.txt` or open the requirements.txt to see if you already satisfied the requirements.
 3. Create an exact directory clone of your directory where you keep your already matched media files by running the CloneDir and by editing the following lines with your directories. This will be used as the DIRECTORY_TO_WATCH parameter.
 ```
 source= ""
