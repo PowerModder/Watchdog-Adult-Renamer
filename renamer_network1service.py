@@ -19,6 +19,7 @@ def rename(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate,filename_ty
     cookies = get_Cookies(siteBaseURL)
     searchTitle = searchTitle.split("_")[0]
     splited = searchTitle.split(' ')[0]
+    sceneID = None
     if (splited.isdigit()):
         sceneID = splited[0]
         searchTitle = searchTitle.replace(splited, '', 1).strip()
@@ -52,9 +53,9 @@ def rename(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate,filename_ty
             if 'collections' in searchResult and searchResult['collections']:
                 curSubsite = searchResult['collections'][0]['name']
             ResultMatrix[x][4] = curSubsite
-            if (searchTitle.isdigit()):
-                ResultMatrix[x][5] = curScore = 100 - enchant.utils.levenshtein(searchTitle, curID)
-            elif searchDate:
+            if (sceneID != None):
+                ResultMatrix[x][5] = curScore = 100 - enchant.utils.levenshtein(sceneID, curID)
+            elif (searchDate != None):
                 ResultMatrix[x][5] = curScore = 100 - enchant.utils.levenshtein(searchDate, curDate)
             else:
                 ResultMatrix[x][5] = curScore = 100 - enchant.utils.levenshtein(searchTitle.lower(), curTitle.lower())
@@ -75,16 +76,25 @@ def rename(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate,filename_ty
         Date = ResultMatrix[0][2]
         Actors = ResultMatrix[0][3]
         Subsite = ResultMatrix[0][4]
-        if (pref_ID == True):
-            new_filename = siteName+' - '+ID
-        else:
-            if (Actors != '' and Subsite != ''): ## We have information for actors and subsite
+        if (Actors != '' and Subsite != ''): ## We have information for actors and Subsite
+            if (pref_ID == True):
+                new_filename = siteName+' - '+ID+filename_type
+            else:
                 new_filename = siteName+' - '+Title+' - '+Date+' - '+Actors +' - '+Subsite+filename_type
-            elif (Actors != '' and Subsite == ''): ## We have information for actors and not for subsite
+        elif (Actors != '' and Subsite == ''): ## We have information for actors and not for Subsite
+            if (pref_ID == True):
+                new_filename = siteName+' - '+ID+filename_type
+            else:
                 new_filename = siteName+' - '+Title+' - '+Date+' - '+Actors +filename_type
-            elif (Actors == '' and Subsite == ''): ## We don't have information for actors and subsite
+        elif (Actors == '' and Subsite == ''): ## We don't have information for actors and Subsite
+            if (pref_ID == True):
+                new_filename = siteName+' - '+ID+filename_type
+            else:
                 new_filename = siteName+' - '+Title+' - '+Date+filename_type
-            elif (Actors == '' and Subsite != ''): ## We don't have information for actors but we have for subsite
+        elif (Actors == '' and Subsite != ''): ## We don't have information for actors but we have for Subsite
+            if (pref_ID == True):
+                new_filename = siteName+' - '+ID+filename_type
+            else:
                 new_filename = siteName+' - '+Title+' - '+Date+' - '+Subsite+filename_type
         ## logger.info new filename
         logger.info ("*************** After-Process filename section *************")
