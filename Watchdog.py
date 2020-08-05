@@ -9,6 +9,7 @@ import logging
 import PAsearchSites
 ## Other .py files
 import renamer_network1service
+import renamer_sitebangbros
 
 ###################################################################### PREFERENCES ##################################################################################################
 ## Replace the following directories with yours. Use double \\
@@ -128,7 +129,8 @@ class Handler(FileSystemEventHandler):
                         ## All sites that are under the network1service this would be more clear at the future
                         if ((siteID == 2) or (54 <= siteID <= 80) or (137 <= siteID <= 182) or (261 <= siteID <= 276) or (288 <= siteID <= 291) or (siteID == 328) or (333 <= siteID <= 340) or (361 <= siteID <= 364) or (397 <= siteID <= 407) or (582 <= siteID <= 583) or (siteID == 690) or (siteID == 733) or (737 <= siteID <= 740) or (siteID == 759) or (siteID == 768) or (798 <= siteID <= 799) or (802 <= siteID <= 806) or (808 <= siteID <= 809) or (822 <= siteID <= 828) or (siteID == 841) or (siteID == 852) or (859 <= siteID <= 860) or (siteID == 872) or (siteID == 876)):
                             new_filename = renamer_network1service.rename(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate,filename_type,pref_ID)
-                        ## elif other if with site ID and renamer call
+                        elif ((83 <= siteID <= 135)):
+                            new_filename = renamer_sitebangbros.rename(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate,filename_type,pref_ID)
                         if (pref_DryRun == False):
                             if (new_filename != None):
                                 if (os.path.exists(DIRECTORY_TO_MOVE+'\\'+siteFolder+'\\')):
