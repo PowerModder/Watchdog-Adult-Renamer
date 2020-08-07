@@ -23,7 +23,7 @@ pref_ID = False
 pref_DryRun = True
 ###################################################################### PREFERENCES ##################################################################################################
 ## Basic Logger information
-loggerwatchdog = LoggerFunction.setup_logger('Watchdog', '.\\Logs\\Watchdog.log',logging.INFO,formatter='%(asctime)s : %(name)s : %(levelname)-8s : %(message)s')
+loggerwatchdog = LoggerFunction.setup_logger('Watchdog','.\\Logs\\Watchdog.log',level=logging.INFO,formatter='%(asctime)s : %(name)s : %(levelname)-8s : %(message)s')
 
 ## Start messages
 loggerwatchdog.info("******************** Pre-initialization ********************")

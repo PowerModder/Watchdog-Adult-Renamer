@@ -7,9 +7,6 @@ import enchant
 ## Other .py files
 import LoggerFunction
 
-## Basic Logger information
-logger = LoggerFunction.setup_logger('Renamers', '.\\Logs\\Watchdog.log',logging.INFO,formatter='%(asctime)s : %(name)s : %(levelname)-8s : %(message)s')
-
 ## Get cookies function
 def get_Cookies(url):
     req = requests.get(url)
@@ -17,6 +14,8 @@ def get_Cookies(url):
     return req.cookies
 
 def rename(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate,filename_type,pref_ID):
+    ## Basic Log Configuration
+    logger = LoggerFunction.setup_logger('Renamers', '.\\Logs\\Watchdog.log',level=logging.INFO,formatter='%(asctime)s : %(name)s : %(levelname)-8s : %(message)s')
     ## Scene Logger information
     SceneNameLogger = LoggerFunction.setup_logger('SceneNameLogger', '.\\Logs\\'+searchTitle+'.log',level=logging.DEBUG,formatter='%(message)s')
     cookies = get_Cookies(siteBaseURL)
@@ -70,11 +69,14 @@ def rename(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate,filename_ty
             ResultsMatrix.append([curID, curTitle, curDate, curActorstring, curSubsite, curScore])
         ResultsMatrix.sort(key=lambda x:x[5],reverse=True)
         ## Calculate new filename section using sorted ResultMatrix
-        ID = ResultsMatrix[0][0]
-        Title = ResultsMatrix[0][1]
-        Date = ResultsMatrix[0][2]
-        Actors = ResultsMatrix[0][3]
-        Subsite = ResultsMatrix[0][4]
+        if (ResultsMatrix[0][5] == 0):
+            pass
+        else:
+            ID = ResultsMatrix[0][0]
+            Title = ResultsMatrix[0][1]
+            Date = ResultsMatrix[0][2]
+            Actors = ResultsMatrix[0][3]
+            Subsite = ResultsMatrix[0][4]
         if (pref_ID == True):
             new_filename = siteName+' - '+ID+filename_type
             SceneNameLogger.debug ("************** Scene in Result but Mismatched **************")
@@ -94,12 +96,14 @@ def rename(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate,filename_ty
             SceneNameLogger.debug ("************** Scene in Result but Mismatched **************")
             SceneNameLogger.debug ("If your scene was in results but the Watchdog mismatched it then use as filename the matched one from below")
             for y in range (ScenesQuantity):
-                SceneNameLogger.debug(siteName+' - '+ResultsMatrix[y][1]+' - '+ResultsMatrix[y][2])
+                SceneNameLogger.debug(siteName+' - '+ResultsMatrix[y][1]+' - '+ResultsMatrix[y][2]+' - '+ResultsMatrix[y][3]+' - '+ResultsMatrix[y][4])
             SceneNameLogger.debug ("************** Scene in Result but Mismatched **************")
         ## logger.debug new filename
         logger.info ("*************** After-Process filename section *************")
         logger.info ("The new filename is: " +new_filename)
         logger.info ("******************** Return to Watchdog ********************")
+        SceneNameLogger.handlers.pop()
+        logger.handlers.pop()
     except:
         new_filename = None
     return new_filename
