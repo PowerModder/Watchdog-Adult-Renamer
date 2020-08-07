@@ -7,11 +7,14 @@ import enchant
 from lxml import html
 import datetime
 ## Other .py files
+import LoggerFunction
 
-## Logger information
-logger = logging.getLogger('Renamers')
+## Basic Logger information
+logger = LoggerFunction.setup_logger('Renamers', '.\\Logs\\Watchdog.log',logging.INFO,formatter='%(asctime)s : %(name)s : %(levelname)-8s : %(message)s')
 
 def rename(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate,filename_type,pref_ID):
+    ## Scene Logger information
+    SceneNameLogger = LoggerFunction.setup_logger('SceneNameLogger', '.\\Logs\\'+searchTitle+'.log',level=logging.DEBUG,formatter='%(message)s')
     splited = searchTitle.split(' ')[0]
     if (splited.isdigit()):
         sceneID = splited
@@ -50,44 +53,43 @@ def rename(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate,filename_ty
                     curScore = 100 - enchant.utils.levenshtein(searchDate, curDate)
                 else:
                     curScore = 100 - enchant.utils.levenshtein(searchTitle.lower(), curTitle.lower())
-                logger.info ("************** Current Scene Matching section **************")
-                logger.info ("ID: " +curID)
-                logger.info ("Title: " +curTitle)
-                logger.info ("Date: " +curDate)
-                logger.info ("Actors: " +curActorstring)
-                logger.info ("Subsite: " +curSubsite)
-                logger.info ("Score: " +str(curScore))
+                SceneNameLogger.debug ("************** Current Scene Matching section **************")
+                SceneNameLogger.debug ("ID: " +curID)
+                SceneNameLogger.debug ("Title: " +curTitle)
+                SceneNameLogger.debug ("Date: " +curDate)
+                SceneNameLogger.debug ("Actors: " +curActorstring)
+                SceneNameLogger.debug ("Subsite: " +curSubsite)
+                SceneNameLogger.debug ("Score: " +str(curScore))
                 ResultsMatrix.append([curID, curTitle, curDate, curActorstring, curSubsite, curScore])
         ResultsMatrix.sort(key=lambda x:x[5],reverse=True)
-        logger.info ("This is the list with the first item being the most matched with the scene. Use those to rename the file!")
-        logger.info (ResultsMatrix)
         ## Calculate new filename section using sorted ResultsMatrix
         ID = ResultsMatrix[0][0]
         Title = ResultsMatrix[0][1]
         Date = ResultsMatrix[0][2]
         Actors = ResultsMatrix[0][3]
         Subsite = ResultsMatrix[0][4]
-        if (Actors != '' and Subsite != ''): ## We have information for actors and Subsite
-            if (pref_ID == True):
-                new_filename = siteName+' - '+ID+filename_type
-            else:
+        if (pref_ID == True):
+            new_filename = siteName+' - '+ID+filename_type
+            SceneNameLogger.debug ("************** Scene in Result but Mismatched **************")
+            SceneNameLogger.debug ("If your scene was in results but the Watchdog mismatched it then use as filename the matched one from below")
+            for y in range (ScenesQuantity):
+                SceneNameLogger.debug(siteName+' - '+ResultsMatrix[y][0])
+            SceneNameLogger.debug ("************** Scene in Result but Mismatched **************")
+        else:
+            if (Actors != '' and Subsite != ''): ## We have information for actors and Subsite
                 new_filename = siteName+' - '+Title+' - '+Date+' - '+Actors +' - '+Subsite+filename_type
-        elif (Actors != '' and Subsite == ''): ## We have information for actors and not for Subsite
-            if (pref_ID == True):
-                new_filename = siteName+' - '+ID+filename_type
-            else:
+            elif (Actors != '' and Subsite == ''): ## We have information for actors and not for Subsite
                 new_filename = siteName+' - '+Title+' - '+Date+' - '+Actors +filename_type
-        elif (Actors == '' and Subsite == ''): ## We don't have information for actors and Subsite
-            if (pref_ID == True):
-                new_filename = siteName+' - '+ID+filename_type
-            else:
+            elif (Actors == '' and Subsite == ''): ## We don't have information for actors and Subsite
                 new_filename = siteName+' - '+Title+' - '+Date+filename_type
-        elif (Actors == '' and Subsite != ''): ## We don't have information for actors but we have for Subsite
-            if (pref_ID == True):
-                new_filename = siteName+' - '+ID+filename_type
-            else:
+            elif (Actors == '' and Subsite != ''): ## We don't have information for actors but we have for Subsite
                 new_filename = siteName+' - '+Title+' - '+Date+' - '+Subsite+filename_type
-        ## logger.info new filename
+            SceneNameLogger.debug ("************** Scene in Result but Mismatched **************")
+            SceneNameLogger.debug ("If your scene was in results but the Watchdog mismatched it then use as filename the matched one from below")
+            for y in range (ScenesQuantity):
+                SceneNameLogger.debug(siteName+' - '+ResultsMatrix[y][1]+' - '+ResultsMatrix[y][2])
+            SceneNameLogger.debug ("************** Scene in Result but Mismatched **************")
+        ## logger.debug new filename
         logger.info ("*************** After-Process filename section *************")
         logger.info ("The new filename is: " +new_filename)
         logger.info ("******************** Return to Watchdog ********************")

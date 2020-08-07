@@ -8,6 +8,7 @@ import logging
 ## Phoenix adult agent files
 import PAsearchSites
 ## Other .py files
+import LoggerFunction
 import renamer_network1service
 import renamer_sitebangbros
 
@@ -21,14 +22,8 @@ pref_ID = False
 ## Change to (True) if you don't want the Watcher to actually move and rename the files (check matching result)
 pref_DryRun = True
 ###################################################################### PREFERENCES ##################################################################################################
-## Logger basic information
-logging.basicConfig(level=logging.INFO,format='%(asctime)s : %(name)s : %(levelname)-8s : %(message)s',filename='Watchdog.log',filemode='a')
-console = logging.StreamHandler()
-console.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s : %(name)s : %(message)s')
-console.setFormatter(formatter)
-logging.getLogger().addHandler(console)
-loggerwatchdog = logging.getLogger('Watchdog')
+## Basic Logger information
+loggerwatchdog = LoggerFunction.setup_logger('Watchdog', '.\\Logs\\Watchdog.log',logging.INFO,formatter='%(asctime)s : %(name)s : %(levelname)-8s : %(message)s')
 
 ## Start messages
 loggerwatchdog.info("******************** Pre-initialization ********************")
