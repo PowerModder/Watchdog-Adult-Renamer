@@ -37,45 +37,43 @@ def rename(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate,filename_ty
         ScenesQuantity = len(searchResults)
         logger.info("Possible matching scenes found in results: " +str(ScenesQuantity))
         ## Make a Matrix to store our results and then sort it via a score function
-        ResultMatrix = [[0 for x in range(6)] for y in range(ScenesQuantity)]
-        x = 0
+        ResultsMatrix = [['0','0','0','0','0',0]]
         for searchResult in searchResults:
             curActorstring = ''
-            ResultMatrix[x][0] = curID = str(searchResult['id'])
-            ResultMatrix[x][1] = curTitle = searchResult['title']
-            ResultMatrix[x][2] = curDate = searchResult['dateReleased'].split("T")[0]
+            curID = str(searchResult['id'])
+            curTitle = searchResult['title']
+            curDate = searchResult['dateReleased'].split("T")[0]
             actorssize = len(searchResult['actors'])
             for i in range(actorssize):
                 actor = searchResult['actors'][i]['name']
                 curActorstring += actor+' & '
-            ResultMatrix[x][3] = curActorstring[:-3]
+            curActorstring = curActorstring[:-3]
             curSubsite = ''
             if 'collections' in searchResult and searchResult['collections']:
                 curSubsite = searchResult['collections'][0]['name']
-            ResultMatrix[x][4] = curSubsite
             if (sceneID != None):
-                ResultMatrix[x][5] = curScore = 100 - enchant.utils.levenshtein(sceneID, curID)
+                curScore = 100 - enchant.utils.levenshtein(sceneID, curID)
             elif (searchDate != None):
-                ResultMatrix[x][5] = curScore = 100 - enchant.utils.levenshtein(searchDate, curDate)
+                curScore = 100 - enchant.utils.levenshtein(searchDate, curDate)
             else:
-                ResultMatrix[x][5] = curScore = 100 - enchant.utils.levenshtein(searchTitle.lower(), curTitle.lower())
+                curScore = 100 - enchant.utils.levenshtein(searchTitle.lower(), curTitle.lower())
             logger.info ("************** Current Scene Matching section **************")
             logger.info ("ID: " +curID)
             logger.info ("Title: " +curTitle)
             logger.info ("Date: " +curDate)
-            logger.info ("Actors: " +curActorstring[:-3])
+            logger.info ("Actors: " +curActorstring)
             logger.info ("Subsite: " +curSubsite)
             logger.info ("Score: " +str(curScore))
-            x = x+1
-        ResultMatrix.sort(key=lambda x:x[5],reverse=True)
+            ResultsMatrix.append([curID, curTitle, curDate, curActorstring, curSubsite, curScore])
+        ResultsMatrix.sort(key=lambda x:x[5],reverse=True)
         logger.info ("This is the list with the first item being the most matched with the scene. Use those to rename the file!")
-        logger.info (ResultMatrix)
+        logger.info (ResultsMatrix)
         ## Calculate new filename section using sorted ResultMatrix
-        ID = ResultMatrix[0][0]
-        Title = ResultMatrix[0][1]
-        Date = ResultMatrix[0][2]
-        Actors = ResultMatrix[0][3]
-        Subsite = ResultMatrix[0][4]
+        ID = ResultsMatrix[0][0]
+        Title = ResultsMatrix[0][1]
+        Date = ResultsMatrix[0][2]
+        Actors = ResultsMatrix[0][3]
+        Subsite = ResultsMatrix[0][4]
         if (Actors != '' and Subsite != ''): ## We have information for actors and Subsite
             if (pref_ID == True):
                 new_filename = siteName+' - '+ID+filename_type
