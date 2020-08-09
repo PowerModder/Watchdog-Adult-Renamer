@@ -9,6 +9,7 @@ This application was made to be runned while you download files. However, you ca
   - Rename the media file with the most matched scene according to your preference and move it to new directory.
   - Dry-Run feature to actually test the functionality of the Watchdog.
   - Log the whole activity to a file for debugging purposes.
+  - Extra log per scene that can help you rename your file if the Watchdog mismatches it at first. The scene should be at the pool that returned though.
   - Script to create an exact clone of another directory.
 
 ### Changelog
