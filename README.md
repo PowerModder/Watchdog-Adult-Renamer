@@ -38,11 +38,9 @@ pref_DryRun = True
 
 ### Known issues
 - Watchdog will report some times only created events for just moved files and not modified events. Go and comment out lines 82-84 and line 87 and uncomment line 86. This way your files will be processed for created or modified events. If a file creates both events then it will be processed two times. Couldn't debug it!
-- Works great with media files that are downloaded from the source.
 
 ### To-Do - (Possible Features)
 - Download posters from the original site, making folder and move the scene and the posters together. That way even if the PhoenixAdult Agent can't match the scene you can use the posters to Plex.
-- Write the fetched information direct to the media file as metadata to avoid Phoenix Agent using embedded information
 
 ### Pull Requests, Recommendations or Questions
 If you want to support a specific site, you can re-factor the code or you have a question please don't hesitate to make a pull request or open an issue. 
