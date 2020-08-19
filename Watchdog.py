@@ -13,21 +13,22 @@ import searcher_network1service
 import searcher_sitebangbros
 import searcher_networkpornpros
 import searcher_networkmilfvr
+import searcher_networkkink
 ## Functions
 import LoggerFunction
 import RenamerFunction
 
 ###################################################################### PREFERENCES ##################################################################################################
 ## Replace the following directories with yours. Use double \\
-DIRECTORY_TO_WATCH = "F:\\Renamer\\Watcher Paths"
-DIRECTORY_TO_MOVE = "F:\\Renamer\\Rest Paths"
-DIRECTORY_UNMATCHED = "F:\\Renamer\\Rest Paths\\Unmatched"
+DIRECTORY_TO_WATCH = ""
+DIRECTORY_TO_MOVE = ""
+DIRECTORY_UNMATCHED = ""
 ## You prefer ID to your filename (True) or scene title (False).
-pref_ID = True
+pref_ID = False
 ## Change to (True) if you don't want the Watcher to actually move and rename the files (check matching result).
 pref_DryRun = True
 ## Here you can set your strip symbol. After that symbol the rest part of the media title will be ignored by PhoenixAdult agent.
-pref_StripSymbol = "~"
+pref_StripSymbol = ""
 ## CAUTION! To be ignored you must have setup your Plex Library in the correct way. Below are some directions if you don't know how to set it up properly.
 ## You can set it during Plex library creation. Create Library, give a name, select your folder where your media is and at Advanced Tab, you need to choose the following settings.
 ## Choose PhoenixAdult as the agent.
@@ -83,7 +84,7 @@ class Watcher:
         self.observer.start()
         try:
             while True:
-                time.sleep(5)
+                time.sleep(1)
         except:
             self.observer.stop()
             loggerwatchdog.info ("Watchdog disabled")
@@ -319,14 +320,20 @@ class Handler(FileSystemEventHandler):
                         ########################################## All sites that are under the Pornpros - End ############################################
                         ########################################## All sites that are under the MilfVR - Start ############################################
                         ## WankzVR
-                        elif (siteID == 476):
+                        elif ((siteID == 476)):
                             ResultsMatrix = searcher_networkmilfvr.search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate)
                             new_filename = RenamerFunction.renamer(siteName,searchTitle,filename_type,ResultsMatrix,pref_ID,pref_StripSymbol)
                         ## MilfVR
-                        elif (siteID == 477):
+                        elif ((siteID == 477)):
                             ResultsMatrix = searcher_networkmilfvr.search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate)
                             new_filename = RenamerFunction.renamer(siteName,searchTitle,filename_type,ResultsMatrix,pref_ID,pref_StripSymbol)
                         ########################################## All sites that are under the MilfVR - End ##############################################
+                        ########################################## All sites that are under the Kink - Start ##############################################
+                        ## Kink + Subsites
+                        elif ((490 <= siteID <= 521) or (siteID == 687) or (735 <= siteID <= 736) or (873 <= siteID <= 874) or (888 <= siteID <= 889)):
+                            ResultsMatrix = searcher_networkkink.search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate)
+                            new_filename = RenamerFunction.renamer(siteName,searchTitle,filename_type,ResultsMatrix,pref_ID,pref_StripSymbol)
+                        ########################################## All sites that are under the Kink - End #################################################
                         if (pref_DryRun == False):
                             if (new_filename != None):
                                 if (os.path.exists(DIRECTORY_TO_MOVE+'\\'+siteFolder+'\\')):
