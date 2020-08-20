@@ -4,53 +4,47 @@ import requests
 import json
 import logging
 import enchant
+from datetime import datetime
 ## Other .py files
 import LoggerFunction
-
-## Get cookies function
-def get_Cookies(url):
-    req = requests.get(url)
-
-    return req.cookies
 
 def search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate):
     ## Basic Log Configuration
     logger = LoggerFunction.setup_logger('Searches', '.\\Logs\\Watchdog.log',level=logging.INFO,formatter='%(asctime)s : %(name)s : %(levelname)-8s : %(message)s')
     ## Scene Logger information
     SceneNameLogger = LoggerFunction.setup_logger('SceneNameLogger', '.\\Logs\\'+searchTitle+'.log',level=logging.DEBUG,formatter='%(message)s')
+    SearchURLFixed = siteSearchURL.replace('/queries','') + '?x-algolia-application-id=I6P9Q9R18E&x-algolia-api-key=08396b1791d619478a55687b4deb48b4'
     ResultsMatrix = [['0','0','0','0','0',0]]
-    cookies = get_Cookies(siteBaseURL)
     searchTitle = searchTitle.split("_")[0]
     splited = searchTitle.split(' ')[0]
     sceneID = None
     if (splited.isdigit()):
         sceneID = splited
         searchTitle = searchTitle.replace(splited, '', 1).strip()
-        URL = siteSearchURL+'/v2/releases?type=scene&id='+sceneID
+        URL = (SearchURLFixed.replace('*','nacms_scenes_production')+'&filters=id='+sceneID+'&hitsPerPage=100')
     else:
-        URL = siteSearchURL+'/v2/releases?type=scene&search='+searchTitle
+        URL = (SearchURLFixed.replace('*','nacms_scenes_production')+'&query='+searchTitle+'&hitsPerPage=100')
     ## Scene matching section
     logger.info ("******************** URL used section **********************")
     logger.info (URL)
-    page = requests.get(URL,headers={'Instance': cookies['instance_token']})
-    searchResults = page.json()['result']
+    page = requests.get(URL)
+    searchResults = page.json()['hits']
     ## The below line logger.debugs the json. You can comment it out to see the retrieved information and for debugging
-    ##logger.debug (searchResults)
+    ## print (searchResults)
     ScenesQuantity = len(searchResults)
     logger.info("Possible matching scenes found in results: " +str(ScenesQuantity))
     for searchResult in searchResults:
         curActorstring = ''
         curID = str(searchResult['id'])
         curTitle = searchResult['title']
-        curDate = searchResult['dateReleased'].split("T")[0]
-        actorssize = len(searchResult['actors'])
+        curDate = datetime.fromtimestamp(searchResult['published_at']).strftime('%Y-%m-%d')
+        actorssize = len(searchResult['performers'])
         for i in range(actorssize):
-            actor = searchResult['actors'][i]['name']
+            actor = searchResult['performers'][i]
             curActorstring += actor+' & '
         curActorstring = curActorstring[:-3]
         curSubsite = ''
-        if 'collections' in searchResult and searchResult['collections']:
-            curSubsite = searchResult['collections'][0]['name']
+        curSubsite = searchResult['site']
         if (sceneID != None):
             curScore = 100 - enchant.utils.levenshtein(sceneID, curID)
         elif (searchDate != None):

@@ -14,6 +14,7 @@ import searcher_sitebangbros
 import searcher_networkpornpros
 import searcher_networkmilfvr
 import searcher_networkkink
+import searcher_sitenaughtyamerica
 ## Functions
 import LoggerFunction
 import RenamerFunction
@@ -44,7 +45,7 @@ pref_StripSymbol = ""
 ###################################################################### PREFERENCES ##################################################################################################
 ## Basic Logger information
 loggerwatchdog = LoggerFunction.setup_logger('Watchdog','.\\Logs\\Watchdog.log',level=logging.INFO,formatter='%(asctime)s : %(name)s : %(levelname)-8s : %(message)s')
-
+################################################################## PRE-INITIALIZATION ###############################################################################################
 ## Start messages
 loggerwatchdog.info("******************** Pre-initialization ********************")
 
@@ -71,6 +72,7 @@ if (pref_StripSymbol != ""):
 else:
     loggerwatchdog.info("You haven't set a Strip Symbol.")
 loggerwatchdog.info("******************** Watchdog initiated ********************")
+################################################################## PRE-INITIALIZATION ##############################################################################################
 
 ## The watcher class code
 class Watcher:
@@ -334,6 +336,12 @@ class Handler(FileSystemEventHandler):
                             ResultsMatrix = searcher_networkkink.search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate)
                             new_filename = RenamerFunction.renamer(siteName,searchTitle,filename_type,ResultsMatrix,pref_ID,pref_StripSymbol)
                         ########################################## All sites that are under the Kink - End #################################################
+                        ########################################## All sites that are under the NaughtyAmerica - Start #####################################
+                        ## NaughtyAmerica + Subsites
+                        elif ((5 <= siteID <= 51) or (siteID == 341) or (393 <= siteID <= 396) or (467 <= siteID <= 468) or (siteID == 581) or (siteID == 620) or (siteID == 625) or (siteID == 691) or (siteID == 749)):
+                            ResultsMatrix = searcher_sitenaughtyamerica.search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate)
+                            new_filename = RenamerFunction.renamer(siteName,searchTitle,filename_type,ResultsMatrix,pref_ID,pref_StripSymbol)
+                        ########################################## All sites that are under the NaughtyAmerica - End #######################################
                         if (pref_DryRun == False):
                             if (new_filename != None):
                                 if (os.path.exists(DIRECTORY_TO_MOVE+'\\'+siteFolder+'\\')):
