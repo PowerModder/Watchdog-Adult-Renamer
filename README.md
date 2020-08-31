@@ -35,7 +35,7 @@ lxml
 ```
 
 
-3. Create an exact directory clone of your directory where you keep your already matched media files by running the CloneDir and by editing the following lines with your directories. This will be used as the DIRECTORY_TO_WATCH parameter.
+3. Create an exact directory clone of your directory where you keep your already matched media files by running the CloneDir and by editing the following lines with your directories. This will be used as the DIRECTORY_TO_WATCH parameter. (Optional, you can manually create some sub-folders to test inside the DIRECTORY_TO_WATCH directory)
 ```
 source= ""
 destination= ""
