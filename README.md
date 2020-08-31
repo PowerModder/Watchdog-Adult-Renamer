@@ -24,6 +24,17 @@ This application was made to be runned while you download files. However, you ca
 
 1. Download the files as a zip and extract them to your desired location.
 2. Open a terminal and run the command `pip install -r requirements.txt` or open the requirements.txt to see if you already satisfied the requirements.
+```
+REQUIREMENTS
+Python 3.1 and above
+watchdog
+regex
+requests
+pyenchant
+lxml
+```
+
+
 3. Create an exact directory clone of your directory where you keep your already matched media files by running the CloneDir and by editing the following lines with your directories. This will be used as the DIRECTORY_TO_WATCH parameter.
 ```
 source= ""
