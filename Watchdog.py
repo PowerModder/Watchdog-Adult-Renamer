@@ -5,8 +5,12 @@ import os
 import re
 import time
 import logging
-import pymediainfo
-import ffmpeg
+import tkinter as tk
+from tkinter import *
+from tkinter import ttk
+from tkinter import filedialog
+# import pymediainfo
+# import ffmpeg
 ## Phoenix adult agent files
 import PAsearchSites
 ## Other .py files
@@ -17,83 +21,159 @@ import searcher_networkpornpros
 import searcher_networkmilfvr
 import searcher_networkkink
 import searcher_sitenaughtyamerica
+import searcher_networkbadoinkvr
 ## Functions
 import LoggerFunction
 import RenamerFunction
 
-###################################################################### PREFERENCES ##################################################################################################
-## Replace the following directories with yours. Use double \\
-DIRECTORY_TO_WATCH = ""
-DIRECTORY_TO_MOVE = ""
-DIRECTORY_UNMATCHED = ""
-## You prefer ID to your filename (True) or scene title (False).
-pref_ID = False
-## Change to (True) if you don't want the Watcher to actually move and rename the files (check matching result).
-pref_DryRun = True
-## Here you can set your strip symbol. After that symbol the rest part of the media title will be ignored by PhoenixAdult agent.
-pref_StripSymbol = ""
-## CAUTION! To be ignored you must have setup your Plex Library in the correct way. Below are some directions if you don't know how to set it up properly.
-## You can set it during Plex library creation. Create Library, give a name, select your folder where your media is and at Advanced Tab, you need to choose the following settings.
-## Choose PhoenixAdult as the agent.
-## Choose Plex Video Files Scanner as the scanner.
-## At the end you will find Enable Filename strip and Strip Symbol. Check the box and put your preffered symbol.
-## If you have already created your library go to Your Library->Three Dots->Manage Library->Edit...->Advanced->Enable Filename strip checked, and put your preffered symbol.
-## If you don't want to use a Strip Symbol just leave it empty like so "".
-## Note: If you don't use a strip symbol the Watchdog will write 'minimal' information to your filename just to work with PhoenixAdult. Below are some examples.
-## For example: If you have pref_ID = True and pref_StripSymbol = "" then the file will be siteName - sceneID - Date (if provided).
-## For example: If you have pref_ID = True and pref_StripSymbol = "~" then the file will be siteName - sceneID - Date ~ Actors - Subsite (if provided).
-## For example: If you have pref_ID = False and pref_StripSymbol = "" then the file will be siteName - Title - Date (if provided).
-## For example: If you have pref_ID = False and pref_StripSymbol = "~" then the file will be siteName - Title - Date ~ Actors - Subsite (if provided).
-###################################################################### PREFERENCES ##################################################################################################
-## Basic Logger information
-loggerwatchdog = LoggerFunction.setup_logger('Watchdog','.\\Logs\\Watchdog.log',level=logging.INFO,formatter='%(asctime)s : %(name)s : %(levelname)-8s : %(message)s')
-################################################################## PRE-INITIALIZATION ###############################################################################################
-## Start messages
-loggerwatchdog.info("******************** Pre-initialization ********************")
-
-## This checks if the directories you have entered are valid. If not it will create them
-for directory in (DIRECTORY_TO_WATCH,DIRECTORY_TO_MOVE,DIRECTORY_UNMATCHED):
-    if os.path.exists(directory):
-        loggerwatchdog.info("Directory exists. Don't need to create: " +directory)
-        pass
-    else:
-        loggerwatchdog.info("Directory doesn't exist. Will try to create: " +directory)
-        try:
-            os.mkdir(directory)
-        except OSError:
-            loggerwatchdog.info ("Error creating directory: " +directory) 
-        else:
-            loggerwatchdog.info ("Directory created successfully: " +directory)
-
-loggerwatchdog.info("Watchdog will be active to this directory: "+DIRECTORY_TO_WATCH)
-loggerwatchdog.info("Watchdog will move the files to this directory: " +DIRECTORY_TO_MOVE)
-loggerwatchdog.info("Preferred ID is set to: " +str(pref_ID))
-loggerwatchdog.info("Dry Run is set to: " +str(pref_DryRun))
-if (pref_StripSymbol != ""):
-    loggerwatchdog.info("Your strip symbol is: " +(pref_StripSymbol))
-else:
-    loggerwatchdog.info("You haven't set a Strip Symbol.")
-loggerwatchdog.info("******************** Watchdog initiated ********************")
-################################################################## PRE-INITIALIZATION ##############################################################################################
-
-## The watcher class code
-class Watcher:
-
+## The GUI + Watcher class code
+class MyGui:
     def __init__(self):
-        self.observer = Observer()
+        def get_pref_DIRECTORY_TO_WATCH():
+            folder_selected = filedialog.askdirectory()
+            DIR_W_Path.set(folder_selected)
 
-    def run(self):
-        event_handler = Handler()
+        def get_pref_DIRECTORY_TO_MOVE():
+            folder_selected = filedialog.askdirectory()
+            DIR_M_Path.set(folder_selected)
+
+        def get_pref_DIRECTORY_UNMATCHED():
+            folder_selected = filedialog.askdirectory()
+            DIR_U_Path.set(folder_selected)
+
+        def pref_set():
+            global DIRECTORY_UNMATCHED
+            DIRECTORY_UNMATCHED = DIR_U_Path.get().replace("/","\\")
+            global DIRECTORY_TO_MOVE
+            DIRECTORY_TO_MOVE = DIR_M_Path.get().replace("/","\\")
+            global DIRECTORY_TO_WATCH
+            DIRECTORY_TO_WATCH = DIR_W_Path.get().replace("/","\\")
+            global pref_ID
+            pref_ID = UI_pref_ID.get()
+            global pref_DryRun
+            pref_DryRun = UI_pref_DryRun.get()
+            global pref_StripSymbol
+            pref_StripSymbol = UI_pref_StripSymbol.get()
+            if ((DIRECTORY_TO_WATCH != "") and (DIRECTORY_TO_MOVE != "") and (DIRECTORY_UNMATCHED != "") and (os.path.exists(DIRECTORY_TO_WATCH)) and (os.path.exists(DIRECTORY_TO_MOVE)) and (os.path.exists(DIRECTORY_UNMATCHED))):
+                self.but.config(state="normal",text="Start Watchdog")
+            else:
+                self.but.config(state="disabled",text="Set Preferences First") 
+
+        root.title('Porndog - Adult Scene Renamer')
+        root.iconbitmap('.\\icon.ico')
+        root.geometry("500x500")
+
+        Watchdog_Preferences_Label = Label(root ,text="Watchdog Preferences - Directories")
+        Watchdog_Preferences_Label.place(x = 192,y = 5)
+
+        DIR_W_Path = tk.StringVar()
+        DIR_W_Label = Label(root ,text="Active Directory - ")
+        DIR_W_Label.place(x = 80,y = 28)
+        self.DIR_W_TextField = Entry(root,textvariable=DIR_W_Path,width=35)
+        self.DIR_W_TextField.place(x = 180,y = 30)
+        self.DIR_W_Button = ttk.Button(root, text="Browse Folder",command=get_pref_DIRECTORY_TO_WATCH)
+        self.DIR_W_Button.place(x = 400,y = 28)
+
+        DIR_M_Path = tk.StringVar()
+        DIR_M_Label = Label(root ,text="Move Directory - ")
+        DIR_M_Label.place(x = 82,y = 58)
+        self.DIR_M_TextField = Entry(root,textvariable=DIR_M_Path,width=35)
+        self.DIR_M_TextField.place(x = 180,y = 60)
+        self.DIR_M_Button = ttk.Button(root, text="Browse Folder",command=get_pref_DIRECTORY_TO_MOVE)
+        self.DIR_M_Button.place(x = 400,y = 58)
+
+        DIR_U_Path = tk.StringVar()
+        DIR_U_Label = Label(root ,text="Unmatched Directory - ")
+        DIR_U_Label.place(x = 50,y = 88)
+        self.DIR_U_TextField = Entry(root,textvariable=DIR_U_Path,width=35)
+        self.DIR_U_TextField.place(x = 180,y = 90)
+        self.DIR_U_Button = ttk.Button(root, text="Browse Folder",command=get_pref_DIRECTORY_UNMATCHED)
+        self.DIR_U_Button.place(x = 400,y = 88)
+
+        UI_FilenamePref_Label = Label(root ,text="Filename Preferences")
+        UI_FilenamePref_Label.place(x = 225,y = 120)
+
+        UI_pref_ID = BooleanVar()
+        self.UI_Checkbutton_ID = Checkbutton(root, text="Prefer Scene ID over Scene Title", variable=UI_pref_ID)
+        self.UI_Checkbutton_ID.place(x = 185,y = 150)
+
+        UI_pref_StripSymbol = tk.StringVar()
+        UI_pref_StripSymbol_Label = Label(root ,text="Strip Symbol - ")
+        UI_pref_StripSymbol_Label.place(x = 95,y = 180)
+        self.UI_pref_StripSymbol_TextField = Entry(root,textvariable=UI_pref_StripSymbol,width=35)
+        self.UI_pref_StripSymbol_TextField.place(x = 180,y = 180)
+
+        UI_OtherPref_Label = Label(root ,text="Other Preferences")
+        UI_OtherPref_Label.place(x = 228,y = 210)
+
+        UI_pref_DryRun = BooleanVar()
+        self.UI_Checkbutton_DryRun = Checkbutton(root, text="Dry Run", variable=UI_pref_DryRun)
+        self.UI_Checkbutton_DryRun.place(x = 240,y = 240)
+
+        self.SET_BUTTON = tk.Button(root,text="Set Preferences",command=pref_set)
+        self.SET_BUTTON.place(x = 230,y = 270)
+        self.but = tk.Button(root,text="Start Watchdog",command=self.start_observer)
+        self.but.place(x = 230,y = 300)  
+        self.but.config(state="disabled",text="Set Preferences First") 
+
+        self.but2 = tk.Button(root,text="Stop Watchdog",command=self.stop_observer)
+        self.but2.place(x = 230,y = 330)  
+        self.but2.config(state="disabled",text="Stop Watchdog")     
+
+    def start_observer(self):
+        loggerwatchdog.info("******************** Pre-initialization ********************")
+        loggerwatchdog.info("Watchdog will be active to this directory: "+DIRECTORY_TO_WATCH)
+        loggerwatchdog.info("Watchdog will move the files to this directory: " +DIRECTORY_TO_MOVE)
+        loggerwatchdog.info("Watchdog will move unmatched files to this directory: " +DIRECTORY_UNMATCHED)
+        loggerwatchdog.info("Preferred ID is set to: " +str(pref_ID))
+        loggerwatchdog.info("Dry Run is set to: " +str(pref_DryRun))
+        if (pref_StripSymbol != ""):
+            loggerwatchdog.info("Your strip symbol is: " +(pref_StripSymbol))
+        else:
+            loggerwatchdog.info("You haven't set a Strip Symbol.")
+        loggerwatchdog.info("******************** Pre-initialization ********************")
+        self.DIR_W_TextField.config(state="disabled")
+        self.DIR_W_Button.config(state="disabled")
+
+        self.DIR_M_TextField.config(state="disabled")
+        self.DIR_M_Button.config(state="disabled")
+
+        self.DIR_U_TextField.config(state="disabled")
+        self.DIR_U_Button.config(state="disabled")
+
+        self.UI_Checkbutton_ID.config(state="disabled")
+        self.UI_pref_StripSymbol_TextField.config(state="disabled")
+        self.UI_Checkbutton_DryRun.config(state="disabled")
+        
+        self.SET_BUTTON.config(state="disabled")
+        self.but.config(state="disabled",text="Watchdog Initiated")
+        self.but2.config(state="normal",text="Stop Watchdog")
+
+        self.observer = Observer()
         self.observer.schedule(event_handler, DIRECTORY_TO_WATCH, recursive=True)
         self.observer.start()
-        try:
-            while True:
-                time.sleep(1)
-        except:
-            self.observer.stop()
-            loggerwatchdog.info ("Watchdog disabled")
+        loggerwatchdog.info("******************** Watchdog initiated ********************")
 
+    def stop_observer(self):
+        self.observer.stop()
         self.observer.join()
+        self.observer = None
+        self.DIR_W_TextField.config(state="normal")
+        self.DIR_W_Button.config(state="normal")
+
+        self.DIR_M_TextField.config(state="normal")
+        self.DIR_M_Button.config(state="normal")
+
+        self.DIR_U_TextField.config(state="normal")
+        self.DIR_U_Button.config(state="normal")
+
+        self.UI_Checkbutton_ID.config(state="normal")
+        self.UI_pref_StripSymbol_TextField.config(state="normal")
+        self.UI_Checkbutton_DryRun.config(state="normal")
+
+        self.SET_BUTTON.config(state="normal")
+        self.but.config(state="disabled",text="Set Preferences First")  
+        self.but2.config(state="disabled",text="Stop Watchdog") 
 
 ## The handler class code
 class Handler(FileSystemEventHandler):
@@ -120,7 +200,7 @@ class Handler(FileSystemEventHandler):
                     if ((filename_type in ('.mp4','.mkv','.avi','.wmv')) and (filename_size > 15000000)):
                         loggerwatchdog.info ("Processing filename %s which is a type of %s" % (filename_title, filename_type))
                         loggerwatchdog.info("The file was placed at folder: " +siteFolder)
-                        trashTitle = ('RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\dK', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4', 'KLEENEX', 'SD', '1080p', '720p', '480p', '360p','mp4_1080','mp4_720','mp4_480','mp4_360','mp4_1080_18','mp4_720_18','mp4_480_18','mp4_360_18','180_180x180_3dh_LR')
+                        trashTitle = ('RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\dK', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4', 'KLEENEX', 'SD','mp4_1080','mp4_720','mp4_480','mp4_360','mp4_1080_18','mp4_720_18','mp4_480_18','mp4_360_18','180_180x180_3dh_LR')
                         filename_title = re.sub(r'\W', ' ', filename_title)
                         for trash in trashTitle:
                             filename_title = re.sub(r'\b%s\b' % trash, '', filename_title, flags=re.IGNORECASE)
@@ -343,6 +423,28 @@ class Handler(FileSystemEventHandler):
                                 ResultsMatrix = searcher_sitenaughtyamerica.search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate)
                                 new_filename = RenamerFunction.renamer(siteName,searchTitle,filename_type,ResultsMatrix,pref_ID,pref_StripSymbol)
                             ########################################## All sites that are under the NaughtyAmerica - End #######################################
+                            ########################################## All sites that are under the BaDoinkVR - Start ##########################################
+                            ## BaDoinkVR
+                            elif ((siteID == 469)):
+                                ResultsMatrix = searcher_networkbadoinkvr.search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate)
+                                new_filename = RenamerFunction.renamer(siteName,searchTitle,filename_type,ResultsMatrix,pref_ID,pref_StripSymbol)
+                            ## BabeVR
+                            elif ((siteID == 470)):
+                                ResultsMatrix = searcher_networkbadoinkvr.search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate)
+                                new_filename = RenamerFunction.renamer(siteName,searchTitle,filename_type,ResultsMatrix,pref_ID,pref_StripSymbol)
+                            ## 18VR
+                            elif ((siteID == 471)):
+                                ResultsMatrix = searcher_networkbadoinkvr.search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate)
+                                new_filename = RenamerFunction.renamer(siteName,searchTitle,filename_type,ResultsMatrix,pref_ID,pref_StripSymbol)
+                            ## KinkVR
+                            elif ((siteID == 472)):
+                                ResultsMatrix = searcher_networkbadoinkvr.search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate)
+                                new_filename = RenamerFunction.renamer(siteName,searchTitle,filename_type,ResultsMatrix,pref_ID,pref_StripSymbol)
+                            ## VRCosplayX
+                            elif ((siteID == 473)):
+                                ResultsMatrix = searcher_networkbadoinkvr.search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate)
+                                new_filename = RenamerFunction.renamer(siteName,searchTitle,filename_type,ResultsMatrix,pref_ID,pref_StripSymbol)
+                            ########################################## All sites that are under the BaDoinkVR - End #############################################
                             if (pref_DryRun == False):
                                 if (new_filename != None):
                                     if (os.path.exists(DIRECTORY_TO_MOVE+'\\'+siteFolder+'\\')):
@@ -388,5 +490,10 @@ class Handler(FileSystemEventHandler):
             pass
 
 if __name__ == '__main__':
-    w = Watcher()
-    w.run()
+    ## Basic Logger information
+    # WorkingDir = os.path.dirname(os.path.abspath(__file__))
+    loggerwatchdog = LoggerFunction.setup_logger('Watchdog','.\\Logs\\Watchdog.log',level=logging.INFO,formatter='%(asctime)s : %(name)s : %(levelname)-8s : %(message)s')
+    root = tk.Tk()
+    event_handler = Handler()
+    gui = MyGui()
+    root.mainloop()
