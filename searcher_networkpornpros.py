@@ -9,11 +9,11 @@ import datetime
 ## Other .py files
 import LoggerFunction
 
-def search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate):
+def search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate,WorkingDir):
     ## Basic Log Configuration
-    logger = LoggerFunction.setup_logger('Searcher', '.\\Logs\\Watchdog.log',level=logging.INFO,formatter='%(asctime)s : %(name)s : %(levelname)-8s : %(message)s')
+    logger = LoggerFunction.setup_logger('Searcher', WorkingDir+'\\Logs\\Watchdog.log',level=logging.INFO,formatter='%(asctime)s : %(name)s : %(levelname)-8s : %(message)s')
     ## Scene Logger information
-    SceneNameLogger = LoggerFunction.setup_logger('SceneNameLogger', '.\\Logs\\'+searchTitle+'.log',level=logging.DEBUG,formatter='%(message)s')
+    SceneNameLogger = LoggerFunction.setup_logger('SceneNameLogger', WorkingDir+'\\Logs\\'+searchTitle+'.log',level=logging.DEBUG,formatter='%(message)s')
     ResultsMatrix = [['0','0','0','0','0',0]]
     URL = (siteSearchURL + searchTitle.replace(" ","-"))
     logger.info ("******************** URL used section **********************")
@@ -29,7 +29,10 @@ def search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate):
         curActorstring = ''
         curSubsite = ''
         curTitle = searchResult.xpath('//h1[@class="t2019-stitle py-1 py-sm-2 pt-lg-0 mb-0 border-bottom"]')[0].text_content().strip()
-        curDate = datetime.datetime.strptime(str(searchResult.xpath('//div[@class="d-inline d-lg-block mb-1"]/span')[0].text_content().strip()),'%B %d, %Y').strftime('%Y-%m-%d')
+        try:
+            curDate = datetime.datetime.strptime(str(searchResult.xpath('//div[@class="d-inline d-lg-block mb-1"]/span')[0].text_content().strip()),'%B %d, %Y').strftime('%Y-%m-%d')
+        except:
+            pass
         actorssize = len(searchResult.xpath('//div[contains(@class, "pt-md")]//a[contains(@href, "/girls/")]'))
         for i in range(actorssize):
             actor = searchResult.xpath('//div[contains(@class, "pt-md")]//a[contains(@href, "/girls/")]')[i].text_content().strip()
