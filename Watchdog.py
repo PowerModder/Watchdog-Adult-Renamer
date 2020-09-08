@@ -1,14 +1,20 @@
 ## Dependencies
+## Watchdog
 from watchdog.observers.polling import PollingObserver as Observer
 from watchdog.events import FileSystemEventHandler
-import os
-import re
-import time
-import logging
+## GUI - TKinter
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
+## Easy Settings
+from easysettings import EasySettings
+## Other Dependecies
+import os
+import re
+import time
+import logging
+## Disabled Dependecies - Not Implemented Yet
 # import pymediainfo
 # import ffmpeg
 ## Phoenix adult agent files
@@ -59,6 +65,13 @@ class MyGui:
                 self.but.config(state="normal",text="Start Watchdog")
             else:
                 self.but.config(state="disabled",text="Start Watchdog") 
+            UserSettings.set("DIR_W", DIRECTORY_TO_WATCH)
+            UserSettings.set("DIR_M", DIRECTORY_TO_MOVE)
+            UserSettings.set("DIR_U", DIRECTORY_UNMATCHED)
+            UserSettings.set("pref_ID", pref_ID)
+            UserSettings.set("pref_StripSymbol", pref_StripSymbol)
+            UserSettings.set("pref_DryRun", pref_DryRun)
+            UserSettings.save()
         ############################################################################## FUNCTIONS - GUI ##############################################################################
         ############################################################################### GUI - GRAPHICS ##############################################################################
         root.title('Porndog - Adult Scene Renamer')
@@ -69,6 +82,7 @@ class MyGui:
         Watchdog_Preferences_Label.place(x = 192,y = 5)
 
         DIR_W_Path = tk.StringVar()
+        DIR_W_Path.set(UserSettings.get("DIR_W"))
         DIR_W_Label = Label(root ,text="Active Directory - ")
         DIR_W_Label.place(x = 80,y = 28)
         self.DIR_W_TextField = Entry(root,textvariable=DIR_W_Path,width=35)
@@ -77,6 +91,7 @@ class MyGui:
         self.DIR_W_Button.place(x = 400,y = 28)
 
         DIR_M_Path = tk.StringVar()
+        DIR_M_Path.set(UserSettings.get("DIR_M"))
         DIR_M_Label = Label(root ,text="Move Directory - ")
         DIR_M_Label.place(x = 82,y = 58)
         self.DIR_M_TextField = Entry(root,textvariable=DIR_M_Path,width=35)
@@ -85,6 +100,7 @@ class MyGui:
         self.DIR_M_Button.place(x = 400,y = 58)
 
         DIR_U_Path = tk.StringVar()
+        DIR_U_Path.set(UserSettings.get("DIR_U"))
         DIR_U_Label = Label(root ,text="Unmatched Directory - ")
         DIR_U_Label.place(x = 50,y = 88)
         self.DIR_U_TextField = Entry(root,textvariable=DIR_U_Path,width=35)
@@ -94,12 +110,16 @@ class MyGui:
 
         UI_FilenamePref_Label = Label(root ,text="Filename Preferences")
         UI_FilenamePref_Label.place(x = 225,y = 120)
-
         UI_pref_ID = BooleanVar()
+        try:
+            UI_pref_ID.set(UserSettings.get("pref_ID"))
+        except:
+            pass
         self.UI_Checkbutton_ID = Checkbutton(root, text="Prefer Scene ID over Scene Title", variable=UI_pref_ID)
         self.UI_Checkbutton_ID.place(x = 185,y = 150)
 
         UI_pref_StripSymbol = tk.StringVar()
+        UI_pref_StripSymbol.set(UserSettings.get("pref_StripSymbol"))
         UI_pref_StripSymbol_Label = Label(root ,text="Strip Symbol - ")
         UI_pref_StripSymbol_Label.place(x = 95,y = 180)
         self.UI_pref_StripSymbol_TextField = Entry(root,textvariable=UI_pref_StripSymbol,width=35)
@@ -107,8 +127,11 @@ class MyGui:
 
         UI_OtherPref_Label = Label(root ,text="Other Preferences")
         UI_OtherPref_Label.place(x = 228,y = 210)
-
         UI_pref_DryRun = BooleanVar()
+        try:
+            UI_pref_DryRun.set(UserSettings.get("pref_DryRun"))
+        except:
+            pass
         self.UI_Checkbutton_DryRun = Checkbutton(root, text="Dry Run", variable=UI_pref_DryRun)
         self.UI_Checkbutton_DryRun.place(x = 240,y = 240)
 
@@ -116,7 +139,7 @@ class MyGui:
         self.SET_BUTTON.place(x = 230,y = 270)
         self.but = tk.Button(root,text="Start Watchdog",command=self.start_observer)
         self.but.place(x = 230,y = 300)  
-        self.but.config(state="disabled",text="Start Watchdog")  
+        self.but.config(state="disabled",text="Start Watchdog")
         ############################################################################### GUI - GRAPHICS ##############################################################################
     def start_observer(self):
         loggerwatchdog.info("******************** Pre-initialization ********************")
@@ -158,6 +181,7 @@ class MyGui:
         self.observer = None
         loggerwatchdog.info("Observer stopped and = None. Set Preferences are Enabled again.")
         loggerwatchdog.info("****************** Stop Watchdog Sequence ******************")
+        
         self.DIR_W_TextField.config(state="normal")
         self.DIR_W_Button.config(state="normal")
 
@@ -200,7 +224,7 @@ class Handler(FileSystemEventHandler):
                         loggerwatchdog.info ("Processing filename %s which is a type of %s" % (filename_title, filename_type))
                         loggerwatchdog.info("The file was placed at folder: " +siteFolder)
                         filename_title = filename_title.replace("_"," ")
-                        trashTitle = ('RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4', 'KLEENEX', 'SD','oculus')
+                        trashTitle = ('RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4', 'KLEENEX', 'SD','oculus','180','360','LR','3dh','\dK')
                         filename_title = re.sub(r'\W', ' ', filename_title)
                         for trash in trashTitle:
                             filename_title = re.sub(r'\b%s\b' % trash, '', filename_title, flags=re.IGNORECASE)
@@ -493,6 +517,7 @@ if __name__ == '__main__':
     WorkingDir = os.path.dirname(os.path.abspath(__file__))
     ## Basic Logger information
     loggerwatchdog = LoggerFunction.setup_logger('Watchdog',WorkingDir+'\\Logs\\Watchdog.log',level=logging.INFO,formatter='%(asctime)s : %(name)s : %(levelname)-8s : %(message)s')
+    UserSettings = EasySettings(WorkingDir+"\\UserSettings.conf")
     root = tk.Tk()
     event_handler = Handler()
     gui = MyGui()
