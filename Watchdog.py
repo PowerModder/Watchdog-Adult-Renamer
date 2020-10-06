@@ -28,6 +28,7 @@ import searcher_networkmilfvr
 import searcher_networkkink
 import searcher_sitenaughtyamerica
 import searcher_networkbadoinkvr
+import searcher_networkEvolvedFights
 ## Functions
 import LoggerFunction
 import RenamerFunction
@@ -75,8 +76,8 @@ class MyGui:
         ############################################################################## FUNCTIONS - GUI ##############################################################################
         ############################################################################### GUI - GRAPHICS ##############################################################################
         root.title('Porndog - Adult Scene Renamer')
-        root.iconbitmap(WorkingDir+'\\icon.ico')
         root.geometry("500x500")
+        root.iconbitmap(WorkingDir+'\\icon.ico')
 
         Watchdog_Preferences_Label = Label(root ,text="Watchdog Preferences - Directories")
         Watchdog_Preferences_Label.place(x = 192,y = 5)
@@ -136,9 +137,9 @@ class MyGui:
         self.UI_Checkbutton_DryRun.place(x = 240,y = 240)
 
         self.SET_BUTTON = tk.Button(root,text="Set Preferences",command=pref_set)
-        self.SET_BUTTON.place(x = 230,y = 270)
+        self.SET_BUTTON.place(x = 170,y = 270)
         self.but = tk.Button(root,text="Start Watchdog",command=self.start_observer)
-        self.but.place(x = 230,y = 300)  
+        self.but.place(x = 270,y = 270)  
         self.but.config(state="disabled",text="Start Watchdog")
         ############################################################################### GUI - GRAPHICS ##############################################################################
     def start_observer(self):
@@ -181,7 +182,7 @@ class MyGui:
         self.observer = None
         loggerwatchdog.info("Observer stopped and = None. Set Preferences are Enabled again.")
         loggerwatchdog.info("****************** Stop Watchdog Sequence ******************")
-        
+
         self.DIR_W_TextField.config(state="normal")
         self.DIR_W_Button.config(state="normal")
 
@@ -236,7 +237,7 @@ class Handler(FileSystemEventHandler):
                         searchDate = searchSettings[2]
                         loggerwatchdog.info ("Filename (after date processing): " +searchTitle)
                         if (searchDate != None):
-                            loggerwatchdog.info ("Date Found embedded at the filename: " +searchDate,WorkingDir)
+                            loggerwatchdog.info ("Date Found embedded at the filename: " +searchDate)
                         else:
                             loggerwatchdog.info ("File didn't contain Date information. If this is false check the RegEx at PASearchSites for Dates")
                         loggerwatchdog.info ("****************** PAsearchSites matching ******************")
@@ -469,6 +470,12 @@ class Handler(FileSystemEventHandler):
                                 ResultsMatrix = searcher_networkbadoinkvr.search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate,WorkingDir)
                                 new_filename = RenamerFunction.renamer(siteName,searchTitle,filename_type,ResultsMatrix,pref_ID,pref_StripSymbol,WorkingDir)
                             ########################################## All sites that are under the BaDoinkVR - End #############################################
+                            ########################################## All sites that are under the EvolvedFights - Start #######################################
+                            ## EvolvedFights
+                            elif ((siteID == 906) or (siteID == 907)):
+                                ResultsMatrix = searcher_networkEvolvedFights.search(siteName,siteBaseURL,siteSearchURL,searchTitle,searchDate,WorkingDir)
+                                new_filename = RenamerFunction.renamer(siteName,searchTitle,filename_type,ResultsMatrix,pref_ID,pref_StripSymbol,WorkingDir)
+                            ########################################## All sites that are under the EvolvedFights - End #########################################
                             if (pref_DryRun == False):
                                 if (new_filename != None):
                                     if (os.path.exists(DIRECTORY_TO_MOVE+'\\'+siteFolder+'\\')):
