@@ -76,8 +76,8 @@ class MyGui:
         ############################################################################## FUNCTIONS - GUI ##############################################################################
         ############################################################################### GUI - GRAPHICS ##############################################################################
         root.title('Porndog - Adult Scene Renamer')
-        root.geometry("500x500")
         root.iconbitmap(WorkingDir+'\\icon.ico')
+        root.geometry("500x500")
 
         Watchdog_Preferences_Label = Label(root ,text="Watchdog Preferences - Directories")
         Watchdog_Preferences_Label.place(x = 192,y = 5)
